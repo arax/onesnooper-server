@@ -1,11 +1,9 @@
-#
-#
-#
+# Handles processing of datagrams with SUCESS monitoring
+# messages. Performs 'save' operation on the backend.
 class OnesnooperServer::Datagrams::SuccessDatagram < ::OnesnooperServer::Datagram
-  #
-  #
-  #
+
   def run(deferred_callback)
-    process(deferred_callback, "Successful monitoring result was recorded")
+    ::EventMachine.defer { deferred_callback.succeed "Successful monitoring result was recorded" }
   end
+
 end

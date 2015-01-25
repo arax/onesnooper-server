@@ -1,6 +1,6 @@
-#
-#
-#
+# Wrapper module for all available datagram processing
+# classes. Each class has to implement method stubs
+# outlined in `OnesnooperServer::Datagram`.
 module OnesnooperServer::Datagrams; end
 
 # Load all available datagram types

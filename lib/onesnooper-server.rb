@@ -1,11 +1,11 @@
-#
-#
-#
+# Internals of the onesnooper-server application. Classes
+# in this namespace should not be used by external libraries.
 module OnesnooperServer; end
 
 # internal ruby dependencies
 require 'date'
 require 'ipaddr'
+require 'base64'
 
 # active support stuff
 require 'active_support'

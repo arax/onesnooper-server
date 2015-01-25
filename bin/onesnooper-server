@@ -35,7 +35,11 @@ EM.run do
   Signal.trap("INT")  { EventMachine.stop }
   Signal.trap("TERM") { EventMachine.stop }
 
-  EM.open_datagram_socket('0.0.0.0', 9000, ::OnesnooperServer::UDPHandler)
+  bind_address = ::OnesnooperServer::Settings.bind_address || '0.0.0.0'
+  bind_port = ::OnesnooperServer::Settings.bind_port || 9000
+  EM.open_datagram_socket(bind_address, bind_port.to_i, ::OnesnooperServer::UDPHandler)
+
+  ::OnesnooperServer::Log.info "Started onesnooper-server on #{bind_address}:#{bind_port}"
 end
 
 ::OnesnooperServer::Log.info "Stopping onesnooper-server ..."

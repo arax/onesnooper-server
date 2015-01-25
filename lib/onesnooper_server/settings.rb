@@ -1,3 +1,6 @@
+# Wraps persistent setting taken from configuration
+# files. This singleton is available throughout the
+# whole application environment.
 class OnesnooperServer::Settings < ::Settingslogic
   gem_root = File.expand_path '../../..', __FILE__
 

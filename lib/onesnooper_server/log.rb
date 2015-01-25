@@ -1,11 +1,15 @@
 require 'logger'
 
+# Wrapper for log subscribers combining the functionality
+# of `Logger` and `ActiveSupport::Notifications`. Allows
+# the use of Singleton-like logging facilities.
 class OnesnooperServer::Log
 
   include ::Logger::Severity
 
   attr_reader :logger, :log_prefix
 
+  # Default subscription handle for notifications
   SUBSCRIPTION_HANDLE = "onesnooper-server.log"
 
   # Creates a new logger
