@@ -2,6 +2,21 @@
 defaults: &defaults
   bind_address: 127.0.0.1
   bind_port: 9000
+  store:
+  - sqlite
+  stores:
+    sqlite:
+      database_file: /tmp/onesnooper-server.sqlite
+    mysql:
+      server: localhost
+      port: 3306
+      username:
+      password:
+    mongodb:
+      server: localhost
+      port: 27017
+      username:
+      password:
   allowed_sources:
   - 127.0.0.1
 

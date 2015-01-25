@@ -11,9 +11,17 @@ class OnesnooperServer::RequestHandler
   # Registered allowed datagram processing classes & the default fallback
   DATAGRAMS = {
     "SUCCESS" => ::OnesnooperServer::Datagrams::SuccessDatagram,
-    "FAILURE" => ::OnesnooperServer::Datagrams::FailureDatagram
+    "FAILURE" => ::OnesnooperServer::Datagrams::FailureDatagram,
   }
   DATAGRAMS.default = ::OnesnooperServer::Datagrams::InvalidDatagram
+
+  # Registered allowed stores for monitoring data
+  STORES = {
+    "mongodb" => ::OnesnooperServer::Stores::MongodbStore,
+    "mysql"   => ::OnesnooperServer::Stores::MysqlStore,
+    "sqlite"  => ::OnesnooperServer::Stores::SqliteStore,
+  }
+  STORES.default = ::OnesnooperServer::Stores::InvalidStore
 
   # Static parsing method for identifying types of incoming datagrams
   # and choosing the right processing class for each datagram. Always
@@ -29,7 +37,7 @@ class OnesnooperServer::RequestHandler
     end
 
     unless valid_peer?(source_ip)
-      ::OnesnooperServer::Log.fatal "[#{self.name}] Dropping monitoring data from #{source_ip}, not allowed!"
+      ::OnesnooperServer::Log.warn "[#{self.name}] Dropping monitoring data from #{source_ip}, not allowed!"
       return DATAGRAMS.default.new
     end
 
@@ -39,6 +47,7 @@ class OnesnooperServer::RequestHandler
     DATAGRAMS[match_data[:result]].new({
       host_id: match_data[:host_id],
       payload: match_data[:payload],
+      stores: store_instances,
     })
   end
 
@@ -53,7 +62,24 @@ private
     monitoring_datagram && monitoring_datagram.kind_of?(String)
   end
 
+  # Matches provided IP address against the list of known
+  # allowed peers.
+  #
+  # @param source_ip [String] IP address to match
+  # @return [Boolean] result
   def self.valid_peer?(source_ip)
     ::OnesnooperServer::Settings.allowed_sources.include? source_ip
   end
+
+  # Retrieves a list of instances for allowed store backends.
+  #
+  # @return [Array] list of store instances
+  def self.store_instances
+    ::OnesnooperServer::Settings.store.collect do |store_name|
+      STORES[store_name].new(
+        ::OnesnooperServer::Settings.stores.respond_to?(store_name) ? ::OnesnooperServer::Settings.stores.send(store_name) : {}
+      )
+    end
+  end
+
 end

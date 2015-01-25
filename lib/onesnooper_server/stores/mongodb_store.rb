@@ -4,10 +4,9 @@ require 'mongo'
 #
 #
 class OnesnooperServer::Stores::MongodbStore < ::OnesnooperServer::Store
-  #
-  #
-  #
-  def save(data)
+
+  def save!(timestamp, data)
     sleep(1)
   end
+
 end
