@@ -1,0 +1,16 @@
+---
+defaults: &defaults
+  test: dummy
+
+###############################################
+#######  DO NOT EDIT AFTER THIS POINT  ########
+###############################################
+
+production:
+  <<: *defaults
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults

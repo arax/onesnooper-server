@@ -25,8 +25,17 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov', '~> 0.9.0'
   spec.add_development_dependency 'rubygems-tasks', '~> 0.2.4'
 
+  # internals
   spec.add_runtime_dependency 'eventmachine', '~> 1.0.4'
-  spec.add_runtime_dependency 'syslogger', '~> 1.6.0'
-  spec.add_runtime_dependency 'sequel', '~> 4.18.0'
+  spec.add_runtime_dependency 'activesupport', '~> 4.2.0'
   spec.add_runtime_dependency 'settingslogic', '~> 2.0.9'
+
+  # SQL DB connectors
+  spec.add_runtime_dependency 'sequel', '~> 4.18.0'
+  spec.add_runtime_dependency 'sqlite3', '~> 1.3.10'
+  spec.add_runtime_dependency 'mysql2', '~> 0.3.17'
+
+  # NoSQL DB connectors
+  spec.add_runtime_dependency 'mongo', '~> 1.11.1'
+  spec.add_runtime_dependency 'bson_ext', '~> 1.11.1'
 end

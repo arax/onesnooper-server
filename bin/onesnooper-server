@@ -24,6 +24,12 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 # internal components
 require 'onesnooper-server'
 
+# initialize logging facilities
+logger = ::OnesnooperServer::Log.new STDERR
+logger.level = ::OnesnooperServer::Log::DEBUG
+
+::OnesnooperServer::Log.info "Starting onesnooper-server ..."
+
 EM.run do
   # hit Control + C to stop
   Signal.trap("INT")  { EventMachine.stop }
@@ -31,3 +37,5 @@ EM.run do
 
   EM.open_datagram_socket('0.0.0.0', 9000, ::OnesnooperServer::UDPHandler)
 end
+
+::OnesnooperServer::Log.info "Stopping onesnooper-server ..."
