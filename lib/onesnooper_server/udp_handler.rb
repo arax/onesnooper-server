@@ -1,24 +1,24 @@
 #
 #
 #
-class OnesnooperServer::UDPHandler < EM::Connection
+class OnesnooperServer::UDPHandler < ::EventMachine::Connection
+
   #
   #
   #
-  def receive_data(command)
-    command.chomp!
-    ::OnesnooperServer::Log.debug("Received #{command}")
-    ::OnesnooperServer::RequestHandler.parse(command).run(callback)
+  def receive_data(monitoring_datagram)
+    monitoring_datagram.chomp!
+    ::OnesnooperServer::Log.debug "[#{self.class.name}] Received #{monitoring_datagram.inspect}"
+    ::OnesnooperServer::RequestHandler.parse(monitoring_datagram).run(callback)
   end
 
 private
+
   #
   #
   #
   def callback
-    ::EM::DefaultDeferrable.new.callback do |response|
-      send_data(response + "\n")
-      ::OnesnooperServer::Log.debug(response)
-    end
+    ::EventMachine::DefaultDeferrable.new.callback { |response| ::OnesnooperServer::Log.debug("[#{self.class.name}] Responding with: #{response}") }
   end
+
 end

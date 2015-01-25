@@ -2,28 +2,28 @@
 #
 #
 class OnesnooperServer::Datagram
+
   #
   #
   #
-  def initialize(param = "")
-    @param = param
+  def initialize(params = {})
+    @params = params
   end
 
   #
   #
   #
-  def run(defer)
+  def run(deferred_callback)
     fail "This method needs to be implemented in subclasses"
   end
 
 private
+
   #
   #
   #
-  def process(defer, time, message)
-    ::EM.defer do
-      sleep(time)
-      defer.succeed(message)
-    end
+  def process(deferred_callback, message)
+    ::EventMachine.defer { deferred_callback.succeed(message) }
   end
+
 end

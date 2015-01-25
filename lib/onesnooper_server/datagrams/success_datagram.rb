@@ -5,7 +5,7 @@ class OnesnooperServer::Datagrams::SuccessDatagram < ::OnesnooperServer::Datagra
   #
   #
   #
-  def run(defer)
-    process(defer, 0, "Successful monitoring result is specified")
+  def run(deferred_callback)
+    process(deferred_callback, "Successful monitoring result was recorded")
   end
 end

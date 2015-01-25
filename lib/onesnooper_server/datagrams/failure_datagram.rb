@@ -5,7 +5,7 @@ class OnesnooperServer::Datagrams::FailureDatagram < ::OnesnooperServer::Datagra
   #
   #
   #
-  def run(defer)
-    process(defer, 0, "Failed monitoring result is specified")
+  def run(deferred_callback)
+    process(deferred_callback, "Failed monitoring result will not be recorded")
   end
 end
