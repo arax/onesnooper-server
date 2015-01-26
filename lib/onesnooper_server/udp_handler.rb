@@ -29,7 +29,7 @@ private
   # for logging and debugging purposes only.
   def callback
     ::EventMachine::DefaultDeferrable.new.callback { |response| ::OnesnooperServer::Log.debug(
-      "[#{self.class.name}] Responding with: #{response}"
+      "[#{self.class.name}] Handled as: #{response}"
     ) }
   end
 

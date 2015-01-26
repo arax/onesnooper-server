@@ -4,7 +4,8 @@
 class OnesnooperServer::Stores::InvalidStore < ::OnesnooperServer::Store
 
   def save!(timestamp, data)
-    fail "InvalidStore is a dummy replacement. Check your configuration!"
+    ::OnesnooperServer::Log.fatal "[#{self.class.name}] This is a dummy store, do not use it!"
+    fail "InvalidStore selected as fallback, check your configuration!"
   end
 
 end

@@ -28,7 +28,7 @@ require 'onesnooper-server'
 logger = ::OnesnooperServer::Log.new STDERR
 logger.level = ::OnesnooperServer::Log::DEBUG
 
-::OnesnooperServer::Log.info "Starting onesnooper-server ..."
+::OnesnooperServer::Log.info "[Main] Starting onesnooper-server ..."
 
 EM.run do
   # hit Control + C to stop
@@ -39,7 +39,7 @@ EM.run do
   bind_port = ::OnesnooperServer::Settings.bind_port || 9000
   EM.open_datagram_socket(bind_address, bind_port.to_i, ::OnesnooperServer::UDPHandler)
 
-  ::OnesnooperServer::Log.info "Started onesnooper-server on #{bind_address}:#{bind_port}"
+  ::OnesnooperServer::Log.info "[Main] Started onesnooper-server on #{bind_address}:#{bind_port}"
 end
 
-::OnesnooperServer::Log.info "Stopping onesnooper-server ..."
+::OnesnooperServer::Log.info "[Main] Stopping onesnooper-server ..."

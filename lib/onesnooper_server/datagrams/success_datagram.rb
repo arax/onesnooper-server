@@ -6,7 +6,8 @@ class OnesnooperServer::Datagrams::SuccessDatagram < ::OnesnooperServer::Datagra
     ::EventMachine.defer do
       parse_payload!
       store_all!
-      deferred_callback.succeed "Successful monitoring result was recorded in #{store_info.join(', ')}"
+      deferred_callback.succeed "Successful monitoring result was " \
+                                "recorded in #{store_info.join(', ')}"
     end
   end
 
@@ -16,20 +17,26 @@ private
   # hash-like structure. Modification is done
   # in-place.
   def parse_payload!
-    # TODO: decode Base64 & parse ONE stuff
-    # @params[:payload]
+    @params[:payload] = ::OnesnooperServer::PayloadParser.parse(@params[:payload])
   end
 
   # Stores decoded and parsed payload in all
   # enabled data stores. Errors are logged
   # but not otherwise reported.
   def store_all!
+    if @params[:payload].blank?
+      ::OnesnooperServer::Log.warn "[#{self.class.name}] Skipping empty payload " \
+                                   "from ONE ID:#{@params[:host_id]}"
+      return
+    end
+
     @params[:stores].each do |store|
       begin
         ::OnesnooperServer::Log.debug "[#{self.class.name}] Saving data in #{store.class.name}"
         store.save!(DateTime.now, @params[:payload])
       rescue => ex
-        ::OnesnooperServer::Log.error "[#{self.class.name}] Error while saving in #{store.class.name}: #{ex.message}"
+        ::OnesnooperServer::Log.error "[#{self.class.name}] Error while saving " \
+                                      "in #{store.class.name}: #{ex.message}"
       end
     end
   end
