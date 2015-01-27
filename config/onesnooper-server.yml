@@ -2,6 +2,7 @@
 defaults: &defaults
   bind_address: 127.0.0.1
   bind_port: 9000
+  log_level: info
   store:
   - sqlite
   stores:
@@ -29,6 +30,8 @@ production:
 
 development:
   <<: *defaults
+  log_level: debug
 
 test:
   <<: *defaults
+  log_level: debug

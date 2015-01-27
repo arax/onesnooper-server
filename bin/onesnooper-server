@@ -26,7 +26,7 @@ require 'onesnooper-server'
 
 # initialize logging facilities
 logger = ::OnesnooperServer::Log.new STDERR
-logger.level = ::OnesnooperServer::Log::DEBUG
+logger.level = ::OnesnooperServer::Log.const_get(::OnesnooperServer::Settings.log_level.upcase)
 
 ::OnesnooperServer::Log.info "[Main] Starting onesnooper-server ..."
 
