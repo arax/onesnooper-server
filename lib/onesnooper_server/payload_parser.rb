@@ -62,6 +62,7 @@ private
       else
         ::OnesnooperServer::Log.error "[#{self.name}] Failed scanning payload " \
                                       "#{payload.inspect} at #{scannable_payload.pos}"
+        break
       end
     end until scannable_payload.eos?
 
