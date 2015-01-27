@@ -4,6 +4,8 @@
 # mirrored monitoring traffic.
 class OnesnooperServer::UDPHandler < ::EventMachine::Connection
 
+  DATAGRAM_PREFIX = 'MONITOR'
+
   # Receives data and triggers processing of the given
   # datagram. Main internal processing triggered from this
   # method should always happen asynchronously (i.e., using
@@ -13,8 +15,14 @@ class OnesnooperServer::UDPHandler < ::EventMachine::Connection
   def receive_data(monitoring_datagram)
     monitoring_datagram.chomp!
     source_port, source_ip = Socket.unpack_sockaddr_in(get_peername)
+    unless monitoring_datagram.start_with?(DATAGRAM_PREFIX)
+      ::OnesnooperServer::Log.warn "[#{self.class.name}] Discarding datagram from " \
+                                   "#{source_ip}:#{source_port} (not #{DATAGRAM_PREFIX})"
+      return
+    end
 
-    ::OnesnooperServer::Log.debug "[#{self.class.name}] Received #{monitoring_datagram.inspect} from #{source_ip}:#{source_port}"
+    ::OnesnooperServer::Log.debug "[#{self.class.name}] Received #{monitoring_datagram.inspect} " \
+                                  "from #{source_ip}:#{source_port}"
     ::OnesnooperServer::RequestHandler.parse(
       monitoring_datagram,
       source_ip,

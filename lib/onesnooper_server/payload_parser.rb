@@ -7,11 +7,12 @@ class OnesnooperServer::PayloadParser
 
   TRIM_CLEANUP = /\s*/
   KEY          = /[[[:upper:]]|[[:digit:]]|_]+/
-  VALUE        = /[[:alnum:]]+/
+  VALUE        = /[[[:alnum:]]|_|-|\.|:]+/
   QUOTED_VALUE = /.+/
+  HASH_VALUE   = /[^\]]+/
   EQUALS       = /#{TRIM_CLEANUP}=#{TRIM_CLEANUP}/
 
-  KEY_HASH_VALUE_REGEXP   = /#{TRIM_CLEANUP}^#{TRIM_CLEANUP}(?<key>#{KEY})#{EQUALS}\[#{TRIM_CLEANUP}(?<value>#{VALUE})#{TRIM_CLEANUP}\]#{TRIM_CLEANUP}/
+  KEY_HASH_VALUE_REGEXP   = /#{TRIM_CLEANUP}^#{TRIM_CLEANUP}(?<key>#{KEY})#{EQUALS}\[(?<value>#{HASH_VALUE})\]#{TRIM_CLEANUP}$#{TRIM_CLEANUP}/m
   KEY_QUOTED_VALUE_REGEXP = /#{TRIM_CLEANUP}^#{TRIM_CLEANUP}(?<key>#{KEY})#{EQUALS}"(?<value>#{QUOTED_VALUE})"#{TRIM_CLEANUP}$#{TRIM_CLEANUP}/
   KEY_RAW_VALUE_REGEXP    = /#{TRIM_CLEANUP}^#{TRIM_CLEANUP}(?<key>#{KEY})#{EQUALS}(?<value>#{VALUE})#{TRIM_CLEANUP}$#{TRIM_CLEANUP}/
 
@@ -54,11 +55,18 @@ private
     scannable_payload = StringScanner.new(payload)
     begin
       if scanned = scannable_payload.scan(KEY_HASH_VALUE_REGEXP)
+        scanned.strip!
         ::OnesnooperServer::Log.debug "[#{self.name}] Scanned #{scanned.inspect}"
       elsif scanned = scannable_payload.scan(KEY_QUOTED_VALUE_REGEXP)
+        scanned.strip!
+        scanned.gsub! "\n", ''
         ::OnesnooperServer::Log.debug "[#{self.name}] Scanned #{scanned.inspect}"
+        analyze_simple(scanned, scanned_payload, KEY_QUOTED_VALUE_REGEXP)
       elsif scanned = scannable_payload.scan(KEY_RAW_VALUE_REGEXP)
+        scanned.strip!
+        scanned.gsub! "\n", ''
         ::OnesnooperServer::Log.debug "[#{self.name}] Scanned #{scanned.inspect}"
+        analyze_simple(scanned, scanned_payload, KEY_RAW_VALUE_REGEXP)
       else
         ::OnesnooperServer::Log.error "[#{self.name}] Failed scanning payload " \
                                       "#{payload.inspect} at #{scannable_payload.pos}"
@@ -67,6 +75,43 @@ private
     end until scannable_payload.eos?
 
     scanned_payload
+  end
+
+  # Parses simple key value strings into the given
+  # hash-like structure.
+  #
+  # @param key_value [String] input string
+  # @param parsed [Hash] output hash-like structure
+  # @return [Boolean] success or failure
+  def self.analyze_simple(key_value, parsed, regexp)
+    matched = key_value.match(regexp)
+    if matched
+      ::OnesnooperServer::Log.error "[#{self.name}] Matched #{key_value.inspect} " \
+                                    "as #{matched[:key].inspect} and #{matched[:value].inspect}"
+      parsed[matched[:key]] = typecast_if_num(matched[:value])
+    else
+      ::OnesnooperServer::Log.error "[#{self.name}] Couldn't match " \
+                                    "#{key_value.inspect} as key & simple value"
+    end
+
+    true
+  end
+
+  # Attempts to type-cast values to `Integer` or `Float` if this casting
+  # makes sense for the given value. Otherwise the original value
+  # is returned.
+  #
+  # @param potential_num [String] value to type-cast if applicable
+  # @return [String, Integer, Float] type-casted value if applicable
+  def self.typecast_if_num(potential_num)
+    case potential_num
+    when potential_num.to_i.to_s
+      potential_num.to_i
+    when potential_num.to_f.to_s
+      potential_num.to_f
+    else
+      potential_num
+    end
   end
 
 end
