@@ -5,15 +5,15 @@
 # hash-like structure.
 class OnesnooperServer::PayloadParser
 
-  TRIM_CLEANUP =/\s*/
+  TRIM_CLEANUP = /\s*/
   KEY          = /[[[:upper:]]|[[:digit:]]|_]+/
-  VALUE        = /[.&&^\[&&^\]]+/
+  VALUE        = /[[:alnum:]]+/
   QUOTED_VALUE = /.+/
-  EQUALS        = /#{TRIM_CLEANUP}=#{TRIM_CLEANUP}/
+  EQUALS       = /#{TRIM_CLEANUP}=#{TRIM_CLEANUP}/
 
-  KEY_HASH_VALUE_REGEXP   = /#{TRIM_CLEANUP}^(?<key>#{KEY})#{EQUALS}\[(?<value>#{VALUE})\]#{TRIM_CLEANUP}/
-  KEY_QUOTED_VALUE_REGEXP = /#{TRIM_CLEANUP}^(?<key>#{KEY})#{EQUALS}"(?<value>#{QUOTED_VALUE})"$#{TRIM_CLEANUP}/
-  KEY_RAW_VALUE_REGEXP    = /#{TRIM_CLEANUP}^(?<key>#{KEY})#{EQUALS}(?<value>#{VALUE})$#{TRIM_CLEANUP}/
+  KEY_HASH_VALUE_REGEXP   = /#{TRIM_CLEANUP}^#{TRIM_CLEANUP}(?<key>#{KEY})#{EQUALS}\[#{TRIM_CLEANUP}(?<value>#{VALUE})#{TRIM_CLEANUP}\]#{TRIM_CLEANUP}/
+  KEY_QUOTED_VALUE_REGEXP = /#{TRIM_CLEANUP}^#{TRIM_CLEANUP}(?<key>#{KEY})#{EQUALS}"(?<value>#{QUOTED_VALUE})"#{TRIM_CLEANUP}$#{TRIM_CLEANUP}/
+  KEY_RAW_VALUE_REGEXP    = /#{TRIM_CLEANUP}^#{TRIM_CLEANUP}(?<key>#{KEY})#{EQUALS}(?<value>#{VALUE})#{TRIM_CLEANUP}$#{TRIM_CLEANUP}/
 
   # Parses given payload into a hash-like structure. Payload
   # is decoded from Base64 and then analyzed and parsed.
