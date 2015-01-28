@@ -1,8 +1,7 @@
 require 'mongo'
 
-#
-#
-#
+# MongoDB-based store for production deployments and dynamic
+# document structure.
 class OnesnooperServer::Stores::MongodbStore < ::OnesnooperServer::Store
 
   def save!(timestamp, data)

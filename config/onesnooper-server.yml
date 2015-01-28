@@ -9,12 +9,13 @@ defaults: &defaults
     sqlite:
       database_file: /tmp/onesnooper-server.sqlite
     mysql:
-      server: localhost
+      database: one_monitoring
+      host: localhost
       port: 3306
       username:
       password:
     mongodb:
-      server: localhost
+      host: localhost
       port: 27017
       username:
       password:

@@ -1,6 +1,5 @@
-#
-#
-#
+# Placeholder store for invalid configuration handling and
+# testing purposes.
 class OnesnooperServer::Stores::InvalidStore < ::OnesnooperServer::Store
 
   def save!(timestamp, data)
