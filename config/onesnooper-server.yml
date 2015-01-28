@@ -4,7 +4,7 @@ defaults: &defaults
   bind_port: 9000
   log_level: info
   store:
-  - sqlite
+  - mongodb
   stores:
     sqlite:
       database_file: /tmp/onesnooper-server.sqlite
@@ -15,10 +15,9 @@ defaults: &defaults
       username:
       password:
     mongodb:
+      database: one_monitoring
       host: localhost
       port: 27017
-      username:
-      password:
   allowed_sources:
   - 127.0.0.1
 
@@ -32,7 +31,11 @@ production:
 development:
   <<: *defaults
   log_level: debug
+  store:
+  - sqlite
 
 test:
   <<: *defaults
   log_level: debug
+  store:
+  - sqlite
