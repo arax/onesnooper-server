@@ -22,19 +22,19 @@ Sequel.migration do
     create_table(:one_monitoring) do
       #
       primary_key :id, :type => Bignum
-      DateTime :timestamp, :null => false
+      DateTime :timestamp, :null => false, :index => true
 
       #
-      String :vm_id, :null => false
-      String :vm_deploy_id, :null => false
+      String :vm_id, :null => false, :index => true
+      String :vm_deploy_id, :null => false, :index => true
       BigDecimal :vm_netrx, :default => 0
       BigDecimal :vm_nettx, :default => 0
       Float :vm_used_cpu, :default => 0.0
       BigDecimal :vm_used_memory, :default => 0
-      String :vm_state, :null => false
+      String :vm_state, :null => false, :index => true
 
       #
-      String :host_name, :null => false
+      String :host_name, :null => false, :index => true
       String :host_arch, :default => 'unknown'
       String :host_model, :default => 'unknown'
       String :host_hypervisor, :null => false
