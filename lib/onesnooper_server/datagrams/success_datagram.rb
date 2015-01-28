@@ -4,10 +4,12 @@ class OnesnooperServer::Datagrams::SuccessDatagram < ::OnesnooperServer::Datagra
 
   def run(deferred_callback)
     ::EventMachine.defer do
-      parse_payload!
-      store_all!
-      deferred_callback.succeed "Successful monitoring result was " \
-                                "recorded in #{store_info.join(', ')}"
+      if parse_payload! && store_all!
+        deferred_callback.succeed "Successful monitoring result was " \
+                                  "recorded in #{store_info.join(', ')}"
+      else
+        deferred_callback.fail "Processing partially or completely failed, see logs"
+      end
     end
   end
 
@@ -23,13 +25,16 @@ private
   # Stores decoded and parsed payload in all
   # enabled data stores. Errors are logged
   # but not otherwise reported.
+  #
+  # @return [Boolean] success in all stores
   def store_all!
     if @params[:payload].blank?
       ::OnesnooperServer::Log.warn "[#{self.class.name}] Skipping empty payload " \
                                    "from ONE ID:#{@params[:host_id]}"
-      return
+      return false
     end
 
+    all_good = true
     @params[:stores].each do |store|
       begin
         ::OnesnooperServer::Log.debug "[#{self.class.name}] Saving data in #{store.class.name}"
@@ -37,8 +42,11 @@ private
       rescue => ex
         ::OnesnooperServer::Log.error "[#{self.class.name}] Error while saving " \
                                       "in #{store.class.name}: #{ex.message}"
+        all_good = false
       end
     end
+
+    all_good
   end
 
   # Returns human-readable information about enabled

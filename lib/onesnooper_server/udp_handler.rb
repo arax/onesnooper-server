@@ -36,9 +36,15 @@ private
   # not send responses to incoming datagrams, this methods is
   # for logging and debugging purposes only.
   def callback
-    ::EventMachine::DefaultDeferrable.new.callback { |response| ::OnesnooperServer::Log.debug(
+    def_deferr = ::EventMachine::DefaultDeferrable.new
+    proc_callback = Proc.new { |response| ::OnesnooperServer::Log.debug(
       "[#{self.class.name}] Handled as: #{response}"
     ) }
+
+    def_deferr.callback &proc_callback
+    def_deferr.errback &proc_callback
+
+    def_deferr
   end
 
 end
