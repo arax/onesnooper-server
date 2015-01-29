@@ -5,6 +5,7 @@ module OnesnooperServer; end
 # internal ruby dependencies
 require 'date'
 require 'ipaddr'
+require 'resolv'
 require 'base64'
 
 # active support stuff

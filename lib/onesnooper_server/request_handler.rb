@@ -32,7 +32,7 @@ class OnesnooperServer::RequestHandler
   # @param source_port [String] port number of the client
   def self.parse(monitoring_datagram, source_ip, source_port)
     unless valid_data?(monitoring_datagram)
-      ::OnesnooperServer::Log.fatal "[#{self.name}] Dropping invalid monitoring data #{monitoring_datagram.inspect}"
+      ::OnesnooperServer::Log.error "[#{self.name}] Dropping invalid monitoring data #{monitoring_datagram.inspect}"
       return DATAGRAMS.default.new
     end
 
@@ -68,7 +68,21 @@ private
   # @param source_ip [String] IP address to match
   # @return [Boolean] result
   def self.valid_peer?(source_ip)
-    ::OnesnooperServer::Settings.allowed_sources.include? source_ip
+    begin
+      source_ip = ::IPAddr.new(::Resolv.getaddress(source_ip))
+      ::OnesnooperServer::Log.debug "[#{self.name}] Resolved source IP" \
+                                    " address to #{source_ip.inspect}"
+    rescue => ex
+      ::OnesnooperServer::Log.error "[#{self.name}] Invalid source IP" \
+                                    " address #{source_ip.inspect}, dropping"
+      return false
+    end
+
+    ::OnesnooperServer::Settings.allowed_sources.each do |allowed_source|
+      return true if ::IPAddr.new(allowed_source).include?(source_ip)
+    end
+
+    false
   end
 
   # Retrieves a list of instances for allowed store backends.

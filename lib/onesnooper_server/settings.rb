@@ -8,5 +8,5 @@ class OnesnooperServer::Settings < ::Settingslogic
   source "/etc/onesnooper-server/onesnooper-server.yml" if File.readable?("/etc/onesnooper-server/onesnooper-server.yml")
   source "#{gem_root}/config/onesnooper-server.yml"
 
-  namespace ENV['RAILS_ENV'] ? ENV['RAILS_ENV'] : 'production'
+  namespace ENV['RAILS_ENV'].blank? ? 'production' : ENV['RAILS_ENV']
 end
