@@ -15,7 +15,7 @@ class OnesnooperServer::SqlStore < ::OnesnooperServer::Store
     if insert_data = data_in_vm_groups(timestamp, data)
       @db_conn[SQL_TABLE_NAME].multi_insert(insert_data)
     else
-      ::OnesnooperServer::Log.warn "[#{self.class.name}] Skipping SQL INSERT for an empty dataset"
+      ::OnesnooperServer::Log.debug "[#{self.class.name}] Skipping SQL INSERT for an empty dataset"
     end
   end
 
@@ -57,7 +57,7 @@ private
         :host_used_memory => data['USEDMEMORY'],
         :one_version => data['VERSION'],
       }
-    end
+    end unless data['VM'].blank?
 
     data_ary.empty? ? nil : data_ary
   end
