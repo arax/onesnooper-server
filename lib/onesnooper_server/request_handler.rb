@@ -15,14 +15,6 @@ class OnesnooperServer::RequestHandler
   }
   DATAGRAMS.default = ::OnesnooperServer::Datagrams::InvalidDatagram
 
-  # Registered allowed stores for monitoring data
-  STORES = {
-    "mongodb" => ::OnesnooperServer::Stores::MongodbStore,
-    "mysql"   => ::OnesnooperServer::Stores::MysqlStore,
-    "sqlite"  => ::OnesnooperServer::Stores::SqliteStore,
-  }
-  STORES.default = ::OnesnooperServer::Stores::InvalidStore
-
   # Static parsing method for identifying types of incoming datagrams
   # and choosing the right processing class for each datagram. Always
   # returns an instance responding to `run(callback)`.
@@ -30,7 +22,8 @@ class OnesnooperServer::RequestHandler
   # @param monitoring_datagram [Object] datagram payload for processing
   # @param source_ip [String] IP address of the client
   # @param source_port [String] port number of the client
-  def self.parse(monitoring_datagram, source_ip, source_port)
+  # @param store_instances [Array] array of pre-initialized store instances
+  def self.parse(monitoring_datagram, source_ip, source_port, store_instances)
     unless valid_data?(monitoring_datagram)
       ::OnesnooperServer::Log.error "[#{self.name}] Dropping invalid monitoring data #{monitoring_datagram.inspect}"
       return DATAGRAMS.default.new
@@ -83,17 +76,6 @@ private
     end
 
     false
-  end
-
-  # Retrieves a list of instances for allowed store backends.
-  #
-  # @return [Array] list of store instances
-  def self.store_instances
-    ::OnesnooperServer::Settings.store.collect do |store_name|
-      STORES[store_name].new(
-        ::OnesnooperServer::Settings.stores.respond_to?(store_name) ? ::OnesnooperServer::Settings.stores.send(store_name) : {}
-      )
-    end
   end
 
 end

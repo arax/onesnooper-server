@@ -4,7 +4,24 @@
 # mirrored monitoring traffic.
 class OnesnooperServer::UDPHandler < ::EventMachine::Connection
 
+  # Allowed datagram prefix
   DATAGRAM_PREFIX = 'MONITOR'
+
+  # Registered allowed stores for monitoring data
+  STORES = {
+    "mongodb" => ::OnesnooperServer::Stores::MongodbStore,
+    "mysql"   => ::OnesnooperServer::Stores::MysqlStore,
+    "sqlite"  => ::OnesnooperServer::Stores::SqliteStore,
+  }
+  STORES.default = ::OnesnooperServer::Stores::InvalidStore
+
+  def initialize(*args)
+    super
+    @store_instances = store_instances(
+      ::OnesnooperServer::Settings.store,
+      ::OnesnooperServer::Settings.stores
+    )
+  end
 
   # Receives data and triggers processing of the given
   # datagram. Main internal processing triggered from this
@@ -26,7 +43,8 @@ class OnesnooperServer::UDPHandler < ::EventMachine::Connection
     ::OnesnooperServer::RequestHandler.parse(
       monitoring_datagram,
       source_ip,
-      source_port
+      source_port,
+      @store_instances
     ).run(callback)
   end
 
@@ -45,6 +63,22 @@ private
     def_deferr.errback &proc_callback
 
     def_deferr
+  end
+
+  # Retrieves a list of instances for allowed store backends.
+  #
+  # @param enabled_stores [Hash] hash-like list of enabled stores
+  # @param store_configs [Hash] hash-like set of store configurations
+  # @return [Array] list of store instances
+  def store_instances(enabled_stores, store_configs)
+    fail "No stores have been enabled, see configuration file" if enabled_stores.blank?
+    fail "No store configuration present, see configuration file" if store_configs.blank?
+
+    enabled_stores.collect do |store_name|
+      STORES[store_name].new(
+        store_configs.respond_to?(store_name) ? store_configs.send(store_name) : {}
+      )
+    end
   end
 
 end
